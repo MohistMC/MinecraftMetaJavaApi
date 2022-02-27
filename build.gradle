@@ -1,0 +1,81 @@
+plugins {
+    id 'java'
+    id 'maven-publish'
+    id 'signing'
+}
+
+group 'com.mohistmc'
+archivesBaseName = "MinecraftMetaJavaApi"
+version '1.0'
+
+repositories {
+    mavenCentral()
+}
+
+dependencies {
+    implementation('com.google.code.gson:gson:2.8.9')
+}
+
+/* Maven central publish code */
+task sourcesJar(type: Jar) {
+    classifier 'sources'
+    from sourceSets.main.allSource
+}
+
+artifacts {
+    archives sourcesJar
+}
+
+publishing {
+    publications {
+        mavenJava(MavenPublication) {
+            from components.java
+            artifact tasks.sourcesJar
+
+            pom {
+                name = 'MinecraftMetaJavaApi'
+                groupId = 'com.mohistmc'
+                artifactId = 'MinecraftMetaJavaApi'
+                description = 'A java libraries to parse json send by mojang api for minecraft game'
+                url = 'https://github.com/MohistMC/MinecraftMetaJavaApi'
+
+                scm {
+                    url = 'https://github.com/MohistMC/MinecraftMetaJavaApi'
+                    connection = 'scm:git:git://github.com/MohistMC/MinecraftMetaJavaApi.git'
+                    developerConnection = 'scm:git:git://github.com/MohistMC/MinecraftMetaJavaApi.git'
+                }
+
+                issueManagement {
+                    system = 'github'
+                    url = 'https://github.com/MohistMC/MinecraftMetaJavaApi/issues'
+                }
+
+                licenses {
+                    license {
+                        name = 'AGPL-3.0'
+                        url = 'https://github.com/MohistMC/MinecraftMetaJavaApi/blob/master/LICENSE'
+                        distribution = 'repo'
+                    }
+                }
+            }
+        }
+    }
+    repositories {
+        maven {
+            credentials {
+                username = System.getenv("OSSRH_USERNAME")
+                password = System.getenv("OSSRH_PASSWORD")
+            }
+            def releasesRepoUrl = "https://s01.oss.sonatype.org/content/repositories/releases/"
+            def snapshotsRepoUrl = "https://s01.oss.sonatype.org/content/repositories/snapshots/"
+            url = project.version.endsWith('SNAPSHOT') ? snapshotsRepoUrl : releasesRepoUrl
+        }
+    }
+}
+
+signing {
+    def signingKey = System.getenv("GPG_PRIVATE_KEY")
+    def signingPassword = System.getenv("GPG_PASSPHRASE")
+    useInMemoryPgpKeys(signingKey, signingPassword)
+    sign publishing.publications.mavenJava
+}
