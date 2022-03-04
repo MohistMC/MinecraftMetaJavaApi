@@ -79,3 +79,9 @@ signing {
     useInMemoryPgpKeys(signingKey, signingPassword)
     sign publishing.publications.mavenJava
 }
+
+tasks.jar {
+    manifest {
+        attributes("Automatic-Module-Name": "com.mohistmc.minecraftmetajavaapi")
+    }
+}
