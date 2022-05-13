@@ -16,7 +16,7 @@ public class VersionManifest {
     }
 
     public Version getVersionById(String id) {
-        for (Version version: versions.stream().toList()) {
+        for (Version version: versions) {
             if (version.getId().equals(id))
                 return version;
         }
